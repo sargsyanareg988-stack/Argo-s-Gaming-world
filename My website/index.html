@@ -1,0 +1,1431 @@
+ <!DOCTYPE html>
+<html>
+<head>
+  <title>Areg's Games</title>
+  <!-- Black & White dark theme with left menu buttons -->
+  <style>
+    :root {
+      --primary: #fff;
+      --accent: #fff;
+      --accent-light: #232323;
+      --background: #232323;
+      --panel-bg: #111;
+      --panel-alt-bg: #232323;
+      --glass-light: rgba(0,0,0,0.09);
+      --glass-dark: #191919;
+      --sidebar-bg: #111;
+      --sidebar-accent: #1a1a1a;
+      --menu-link: #fff;
+      --menu-active: #000;
+      --menu-active-bg: #fff;
+      --border-radius: 18px;
+      --border-color: #333;
+      --card-shadow: 0 5px 18px 0 #000b, 0 1px 2px #1116;
+      --focus: #fff;
+      --success: #fff;
+      --danger: #fff;
+      --font-main: 'Inter', 'Segoe UI', Arial, sans-serif;
+      --font-title: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      --divider: #222;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--background);
+      color: #fff;
+      font-family: var(--font-main);
+      min-height: 100vh;
+    }
+    body {
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    /* Sidebar menu */
+    .sidebar {
+      width: 220px;
+      background: var(--sidebar-bg);
+      border-right: 2.2px solid var(--border-color);
+      padding: 38px 0 30px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      /* --- Changed for scrolling sidebar: --- */
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 99;
+      overflow-y: auto;
+      /* Optional: Hide native scrollbar but allow scroll, for a neater look */
+      scrollbar-width: thin;
+      scrollbar-color: #232323 #111;
+    }
+    .sidebar .side-title {
+      font-family: var(--font-title);
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #fff;
+      margin: 0 0 30px 30px;
+      letter-spacing: .11em;
+    }
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .sidebar a {
+      padding: 13px 18px 13px 34px;
+      color: var(--menu-link);
+      text-decoration: none;
+      font-size: 1.14rem;
+      border-left: 4px solid transparent;
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
+      font-weight: 600;
+      margin: 0 0 2px 0;
+      background: none;
+      transition: 
+        background .15s, 
+        color .17s, 
+        border-color .2s,
+        box-shadow .13s;
+      cursor: pointer;
+      font-family: var(--font-main);
+      display: block;
+      letter-spacing: 0.04em;
+      position: relative;
+    }
+    .sidebar a.active, .sidebar a:focus, .sidebar a:hover {
+      color: #000;
+      background: #fff;
+      border-left: 4px solid #fff;
+      box-shadow: 4px 12px 36px #181818;
+    }
+    @media (max-width: 900px) {
+      .sidebar { width: 85px; min-width: 70px; }
+      .sidebar .side-title { font-size: 0.89rem;margin-left:12px;}
+      .sidebar nav a { font-size: 1rem; padding: 10px 7px 10px 13px;}
+    }
+    @media (max-width: 600px) {
+      .sidebar { display:none;}
+    }
+
+    /* --- Main content should have margin-left to avoid overlaying the fixed sidebar --- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--background);
+      min-height: 100vh;
+      margin-left: 220px; /* match .sidebar width */
+      transition: margin-left 0.2s;
+    }
+    @media (max-width: 900px) {
+      .main-content { margin-left: 85px; }
+    }
+    @media (max-width: 600px) {
+      .main-content { margin-left: 0; }
+    }
+    #main-title {
+      font-family: var(--font-title);
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #fff;
+      margin: 38px 0 10px 0;
+      letter-spacing: 0.05em;
+      background: none;
+      text-shadow: 0 2px 32px #000a, 0 2px 10px #fff1;
+      animation: fadeInTitle 1.1s cubic-bezier(.21,1.4,.39,.89) .1s backwards;
+      text-align: center;
+    }
+    @keyframes fadeInTitle {
+      0% { opacity: 0; filter: blur(4px); transform:translateY(-18px) scale(0.96);}
+      100%{ opacity: 1; filter: none; transform:translateY(0) scale(1);}
+    }
+    #main-subtitle {
+      font-size: 1.12rem;
+      color: #ccc;
+      margin-bottom: 32px;
+      font-weight: 500;
+      text-shadow: 0 1.5px 7px #444;
+      animation: fadeInTitle 1.5s ease .22s backwards;
+      text-align: center;
+    }
+
+    /* Panel (General - Black glass) */
+    .glass-panel, .about-panel, .feature-wrapper, .shop-panel {
+      background: var(--panel-bg);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 26px #000, 0 1.5px 10px #222;
+      border: 1.7px solid var(--border-color);
+      padding: 2rem 2.5rem 2.5rem 2.5rem;
+      margin: 0 auto 40px auto;
+      max-width: 1080px;
+      transition: box-shadow .19s, background .13s;
+      position: relative;
+      animation: fadeUp .8s cubic-bezier(.33,1.5,.3,.82);
+    }
+    .glass-panel:hover, .about-panel:hover, .shop-panel:hover, .feature-wrapper:hover {
+      box-shadow: 0 6px 38px #000, 0 2px 16px #222;
+      background: var(--panel-alt-bg);
+    }
+    @keyframes fadeUp{
+      0%{opacity:0;transform:translateY(44px) scale(0.96);}
+      100%{opacity:1;transform:translateY(0) scale(1);}
+    }
+
+    /* About panel */
+    .about-panel {
+      display: flex;
+      align-items: center;
+      gap: 46px;
+      flex-wrap: wrap;
+      max-width: 860px;
+      margin: 28px auto 50px auto;
+      border-radius: 26px;
+      background: var(--panel-bg);
+      box-shadow: 0 8px 20px #000;
+    }
+    .about-panel img#about-profile-pic {
+      border-radius: 50%;
+      box-shadow: 0 6px 22px #000, 0 1px 17px #111;
+      width: 144px;
+      border: 2.5px solid #444;
+      margin-bottom: 0;
+      transition: box-shadow .18s, filter .13s, border .2s;
+      background: #181818;
+    }
+    .about-panel img#about-profile-pic:hover {
+      box-shadow: 0 2px 24px #444;
+      border-color: #fff;
+      filter: brightness(1.12) saturate(1.02);
+      cursor: pointer;
+    }
+    .about-panel h2 {
+      color: #fff;
+      margin: 0 0 13px 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.13em;
+      font-family: var(--font-title);
+      text-align: left;
+      text-shadow: 0 1.5px 14px #8884;
+    }
+    .about-panel #about-me-desc {
+      font-size:1.06rem;
+      color:#bbb;
+      line-height:1.58em;
+      background: var(--glass-light);
+      padding: 14px 18px 13px 0;
+      border-radius: 16px;
+      min-width: 220px;
+      letter-spacing: .01em;
+      text-align: left;
+      box-shadow: 0 2px 11px #0006;
+      transition: background 0.13s;
+    }
+    .about-panel #about-me-desc:hover {
+      background: #181818;
+    }
+    #featured-games-title {
+      color: #fff;
+      font-size: 2rem;
+      font-family: var(--font-title);
+      margin: 64px 0 24px 0;
+      letter-spacing: .09em;
+      font-weight: 700;
+      text-shadow: 0 2px 22px #000, 0 2px 13px #111;
+      animation: fadeUp 1.25s cubic-bezier(.25,1.4,.3,.82) .15s backwards;
+    }
+    .feature-wrapper {
+      background: var(--glass-dark);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      padding: 2.4rem 1.2rem;
+      min-width: 0;
+      margin-bottom: 40px;
+    }
+    #games-list {
+      display: flex;
+      gap: 28px;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom:18px;
+      mask-image: linear-gradient(to right, transparent 0 1%, #000 12% 88%, transparent 100%);
+      margin-left: -10px;
+    }
+    #games-list > div[data-admin-game] {
+      background: linear-gradient(135deg, #181818 90%, #222 120%);
+      border-radius: 18px;
+      box-shadow: 0 5px 24px #000, 0 2px 8px #222;
+      min-width: 310px;
+      max-width: 370px;
+      padding: 28px 17px 19px 17px;
+      text-align: center;
+      flex: 0 0 335px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.6px solid #222;
+      transition: 
+        box-shadow .22s,
+        background 0.17s,
+        border 0.18s,
+        transform 0.14s;
+      position: relative;
+      z-index: 2;
+      animation: fadeUp 1s cubic-bezier(.14,1.6,.18,.81) backwards;
+    }
+    #games-list > div[data-admin-game]:hover {
+      background: linear-gradient(128deg, #222 87%, #191919 100%);
+      box-shadow: 0 16px 40px #000, 0 3px 14px #232323;
+      border: 1.7px solid #fff;
+      transform: translateY(-5px) scale(1.01);
+      z-index: 6;
+    }
+    #games-list img[id^=game] {
+      border-radius: 13px;
+      box-shadow: 0 5px 21px 0 #000b, 0 2px 8px #222d;
+      margin-bottom: 15px;
+      width: 97%;
+      max-width: 244px;
+      border: 2px solid #2d2d2d;
+      transition: box-shadow .18s, filter .16s, transform .13s;
+      background: #181818;
+    }
+    #games-list img[id^=game]:hover {
+      box-shadow: 0 11px 32px #000c;
+      filter: brightness(1.05) saturate(1.03);
+      transform: scale(1.036) rotate(-1.8deg);
+      z-index: 11;
+    }
+    #games-list div[id$="-title"] {
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 1.37rem;
+      color: #fff;
+      text-shadow: 0 1.5px 7px #000d;
+      margin: 13px 0 7px 0;
+      letter-spacing: .04em;
+      background: none;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: unset;
+      position: relative;
+    }
+    #games-list div[id$="-desc"] {
+      font-size: 1.03rem;
+      color: #ccc;
+      margin-bottom: 10px;
+      font-weight: 500;
+      transition: color 0.18s;
+    }
+    .game-btn {
+      background: linear-gradient(90deg, #fff 8%, #222 90%);
+      color: #111;
+      font-weight: 700;
+      padding: 12px 33px;
+      border-radius: 16px;
+      border: 1.5px solid #222;
+      font-size: 1.08rem;
+      font-family: var(--font-title);
+      letter-spacing: .01em;
+      cursor: pointer;
+      box-shadow: 0 2px 7px #000a;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      outline: none;
+      transition: 
+        background 0.17s,
+        color 0.11s,
+        box-shadow .11s,
+        border 0.12s,
+        transform 0.09s;
+      position: relative;
+      overflow: hidden;
+    }
+    .game-btn:hover, .game-btn:focus {
+      background: linear-gradient(90deg,#333 2%,#fff 89%);
+      color: #000;
+      box-shadow: 0 9px 30px #000, 0 2px 8px #fff2;
+      transform: scale(1.052) translateY(-2px);
+    }
+    .game-btn:active {
+      background: linear-gradient(90deg,#111 0%,#ddd 98%);
+      transform: scale(0.99);
+      box-shadow: 0 2px 7px #fff4;
+    }
+    .comment-section-outer {
+      width: 95%;
+      margin: 12px auto 0 auto;
+      opacity: 0.96;
+      padding: 0 1px 0 1px;
+    }
+    .comment-section-inner {
+      display: flex;
+      gap: 10px;
+      min-width: 220px;
+      align-items: flex-start;
+    }
+    .comment-section-inner form {
+      min-width: 175px;
+      flex: 2 1 auto;
+      display: flex;
+      flex-direction: column;
+      background: #222;
+      border-radius: 10px;
+      padding: 11px 9px 7px 9px;
+      color: #fff;
+      border: 1px solid #444;
+      box-shadow: 0 2px 10px #222a;
+      transition: border 0.14s, box-shadow 0.22s;
+    }
+    .comment-section-inner form:focus-within {
+      border: 1px solid var(--focus);
+      box-shadow: 0 4px 14px #fff2;
+    }
+    .comment-section-inner input[type="text"] {
+      border-radius: 7px;
+      border: 1px solid #2d2d2d;
+      padding: 7px 8px;
+      margin-bottom: 7px;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 1em;
+      outline: none;
+      box-shadow: 0 1.5px 3px #000 inset;
+      transition: background 0.16s, border 0.15s;
+    }
+    .comment-section-inner input[type="text"]:focus {
+      background: #232323;
+      border: 1px solid var(--accent);
+    }
+    .comment-section-inner button[type="submit"] {
+      background: linear-gradient(94deg, #fff 25%, #222 90%);
+      border-radius: 7px;
+      color: #111;
+      font-weight: 700;
+      padding: 4px 0;
+      cursor: pointer;
+      font-size: 1em;
+      margin-top: 2px;
+      margin-bottom: 5px;
+      border: none;
+      transition: background .14s, color .13s;
+      box-shadow: 0 2px 7px #222;
+    }
+    .comment-section-inner button[type="submit"]:hover {
+      background:linear-gradient(90deg,#111 30%,#fff 95%);
+      color:#000;
+    }
+    .comments-list {
+      display: flex;
+      gap: 7px;
+      align-items: flex-start;
+      min-height: 18px;
+      flex-wrap: wrap;
+      margin-left: 5px;
+    }
+    .game-comment {
+      background: linear-gradient(90deg, #222 65%, #444 110%);
+      border-radius: 8px;
+      padding: 7px 13px;
+      color: #fff;
+      min-width: 100px;
+      font-size: 0.99em;
+      margin-bottom: 1px;
+      word-break: break-word;
+      font-family: inherit;
+      box-shadow: 0 1px 8px #0002;
+      transition: box-shadow 0.13s, filter 0.11s;
+      filter: blur(0.1px);
+    }
+    .game-comment:hover {
+      background: linear-gradient(90deg, #333 70%, #222 110%);
+      filter: brightness(1.03);
+      box-shadow: 0 3px 14px #0004;
+    }
+    /* Forums section styles */
+    .game-forum-section {
+      margin-top: 14px;
+      margin-bottom: 4px;
+      background: #181818;
+      border-radius: 10px;
+      padding: 11px 13px 13px 13px;
+      color: #fff;
+      border: 1.2px solid #292929;
+      box-shadow: 0 2px 10px #111a;
+      font-family: var(--font-main);
+      width: 97%;
+    }
+    .forum-topic-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0 0 7px 0;
+    }
+    .forum-topic-list li {
+      margin-bottom: 9px;
+      padding: 7px 11px;
+      background: linear-gradient(90deg,#242424, #212121 110%);
+      border-radius: 7px;
+      color: #fff;
+      box-shadow: 0 1.5px 9px #1115;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .forum-topic-title {
+      font-weight: 600;
+      font-size: 1.03em;
+      margin-right: 12px;
+      color: #fff;
+    }
+    .forum-topic-content {
+      color: #ccd;
+      font-size: .95em;
+    }
+    .forum-add-topic-form {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+      margin-top: 8px;
+    }
+    .forum-add-topic-form input[type="text"],
+    .forum-add-topic-form textarea {
+      border-radius: 5px;
+      border: 1px solid #333;
+      background: #191919;
+      color: #fff;
+      font-size: .97em;
+      padding: 6px 8px;
+      margin-bottom: 0;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      transition: background 0.14s, border 0.14s;
+    }
+    .forum-add-topic-form input[type="text"]:focus,
+    .forum-add-topic-form textarea:focus {
+      background: #222;
+      border: 1.2px solid var(--accent);
+    }
+    .forum-add-topic-form button {
+      padding: 7px 18px;
+      border-radius: 7px;
+      background: linear-gradient(95deg,#fff 5%,#333 97%);
+      border: none;
+      color: #181818;
+      font-weight: 700;
+      font-family: var(--font-title);
+      font-size: .96em;
+      cursor: pointer;
+      transition: background .14s, color .13s;
+      margin-bottom: 0;
+      box-shadow: 0 2px 8px #0003;
+    }
+    .forum-add-topic-form button:hover {
+      background: linear-gradient(95deg,#222 10%,#fff 90%);
+      color: #000;
+    }
+    .forum-topics-title {
+      margin: 0 0 6px 1px;
+      font-weight: 700;
+      font-size: 1.05em;
+      letter-spacing: .02em;
+      color: #fff;
+    }
+    /* Showcase Video section */
+    #rivals-title {
+      font-size: 1.17rem !important;
+      color: #fff !important;
+      margin-bottom: 15px !important;
+      font-weight: bold !important;
+      letter-spacing: .07em;
+      font-family: var(--font-title);
+      background: none;
+      -webkit-background-clip: initial;
+      -webkit-text-fill-color: initial;
+      text-shadow: 0 2px 8px #0005;
+    }
+    #rivalsVideo {
+      max-width: 365px;
+      border-radius: 12px;
+      box-shadow: 0 2px 18px #000d, 0 2px 8px #222a;
+      margin-bottom: 18px;
+      border: 1.5px solid var(--accent);
+      background: #181818;
+      transition: box-shadow 0.2s;
+    }
+    #rivalsVideo:hover {
+      box-shadow: 0 8px 38px #222c, 0 2px 11px #1119;
+      border-color: var(--success);
+      filter: brightness(1.03);
+    }
+
+    /* Modal (Admin, Tutorials) White Glass */
+    #adminPanelLauncher {
+      position: fixed;
+      bottom: 30px;
+      right: 40px;
+      z-index: 5000;
+      background: linear-gradient(95deg,#222 25%,#444 100%);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 12px 32px;
+      font-size: 1.04rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 13px #000c, 0 1.5px 3px #000;
+      outline: none;
+      transition: background 0.18s, color 0.10s, box-shadow 0.16s;
+      animation: fadeUp 1.4s .2s cubic-bezier(.33,1.7,.3,.8) backwards;
+      letter-spacing: .09em;
+    }
+    #adminPanelLauncher:hover {
+      background: linear-gradient(97deg, #191919 0%, #fff 88%);
+      color: #000;
+      box-shadow: 0 7px 23px #fff2;
+      transform: scale(1.055) rotate(-2.3deg);
+    }
+    #adminLoginModal, #adminPanelModal, #tutorialModal {
+      display: none;
+      background: rgba(0,0,0,0.97);
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 9890;
+      align-items: center;
+      justify-content: center;
+      animation: fadeUp 0.28s cubic-bezier(.39,1.7,.22,.87);
+    }
+    #adminLoginBox, #adminPanelBox, #tutorialModal > div {
+      background: linear-gradient(120deg, rgba(14,14,14,0.97) 90%,rgba(50,50,50,0.13) 100%);
+      padding: 33px 30px 28px 30px;
+      border-radius: 16px;
+      min-width: 250px;
+      box-shadow: 0 6px 45px #0008, 0 2px 11px #222;
+      border: 1.2px solid var(--accent-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 50px auto 0 auto;
+      animation: fadeUp 1.04s cubic-bezier(.18,1.1,.28,.99);
+      transition: box-shadow .29s, background .24s;
+      position: relative;
+      /* Make the admin panel box scrollable if contents overflow vertically */
+      max-height: 82vh;
+      overflow-y: auto;
+    }
+    #adminLoginBox input[type="password"], .admin-field-edit-row input, .admin-field-edit-row textarea {
+      font-size: 1.07rem;
+      border-radius: 7px;
+      border: 1.2px solid #333;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      background: #222;
+      color: #fff;
+      width: 93%;
+      outline: none;
+      box-shadow: 0 2px 8px #181818 inset;
+      transition: border 0.16s, background 0.15s;
+      font-family: var(--font-main);
+    }
+    #adminLoginBox input[type="password"]:focus,
+    .admin-field-edit-row input:focus, .admin-field-edit-row textarea:focus {
+      border: 1.6px solid var(--focus);
+      background: #111;
+    }
+    #adminLoginBox button, #adminPanelBox button, .admin-edit-btn, .admin-close-btn {
+      padding: 7px 21px;
+      font-size: 1.09rem;
+      border-radius: 8px;
+      background: linear-gradient(87deg,#191919 35%,#fff 95%);
+      border: none;
+      color: #191919;
+      font-weight: 700;
+      cursor: pointer;
+      margin: 4px 0 10px 0;
+      box-shadow: 0 2px 8px #2228;
+      outline: none;
+      transition: background .14s, color .10s, box-shadow .10s;
+      position: relative;
+      overflow: hidden;
+      font-family: var(--font-title);
+    }
+    #adminLoginBox button:hover, #adminPanelBox button:hover, .admin-edit-btn:hover, .admin-close-btn:hover {
+      background: linear-gradient(90deg, #111 0%,#fff 90%);
+      color: #000;
+      box-shadow: 0 2px 13px #222;
+      z-index: 2;
+    }
+    .admin-close-btn {
+      background: none;
+      color: #fff;
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 2.6rem;
+      font-weight: bold;
+      box-shadow: none;
+      width: 38px;
+      height: 38px;
+      border:none;
+      transition: color 0.13s, background 0.18s;
+      padding: 0;
+      outline: none;
+    }
+    .admin-close-btn:hover {
+      background: #191919;
+      color: #fff;
+    }
+    .admin-section-title {
+      color: #fff;
+      margin-top: 10px;
+      margin-bottom: 0;
+      font-weight: bold;
+      font-size: 1.06em;
+      letter-spacing: 0.06em;
+    }
+    .admin-panel-divider {
+      margin: 8px auto 7px auto;
+      border-bottom: 1.8px solid var(--divider);
+      width: 94%;
+      opacity: 0.25;
+    }
+    .admin-panel-actions { margin-top: 11px; }
+    #admin-games-controls > div {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    .admin-field-edit-row {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 11px;
+      flex-wrap: wrap;
+      min-width:210px;
+    }
+    /* Shop Section (cards) */
+    .shop-panel {
+      background: linear-gradient(108deg, #181818 90%,#111 120%);
+      box-shadow: 0 2px 24px #0005, 0 1px 6px #000a;
+      border-radius: 18px;
+      padding: 2.3rem 2vw 2.7rem 2vw;
+      margin-top: 62px;
+      max-width: 1040px;
+      border: 1.7px solid #2d2d2d;
+      animation: fadeUp .82s cubic-bezier(.38,2,.13,.82) .11s backwards;
+    }
+    .shop-panel h2 {
+      color: var(--primary);
+      margin: 0 0 24px 0;
+      font-size: 1.36rem;
+      letter-spacing: .07em;
+      font-family: var(--font-title);
+      font-weight: 600;
+    }
+    .shop-panel .shop-card {
+      background: linear-gradient(109deg,#191919 83%, #111 120%);
+      border-radius: 13px;
+      box-shadow: 0 2px 12px #0007, 0 1px 7px #2226;
+      padding: 17px 13px 18px 13px;
+      width:220px;
+      margin-bottom: 21px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.2px solid #2b2b2b;
+      transition: box-shadow .13s, border .07s, transform .11s;
+    }
+    .shop-panel .shop-card:hover {
+      box-shadow: 0 6px 18px #000;
+      border: 1.26px solid var(--accent);
+      transform: scale(1.021) rotate(-1deg);
+      filter: brightness(1.03);
+    }
+    .shop-panel .shop-card img {
+      border-radius: 9px;
+      margin-bottom: 8px;
+      width: 78px;
+      box-shadow: 0 3px 12px #191919;
+      transition: box-shadow 0.09s, filter .11s;
+      background: #111;
+    }
+    .shop-panel .shop-card img:hover {
+      box-shadow:0 8px 24px #222a;
+      filter: brightness(1.07);
+    }
+    .shop-panel .shop-card > div:first-of-type {
+      font-weight: 700; font-size:1.07rem; color:var(--accent); margin-bottom:7px; letter-spacing:.04em;
+      font-family: var(--font-title);
+    }
+    .shop-panel .shop-card > div:nth-of-type(2) {
+      font-size: .95rem; color: #bbb; margin-bottom: 7px;
+    }
+    .shop-panel .shop-card > div:nth-of-type(3) {
+      font-weight:700; color:#fff; font-size:1.09rem; margin-bottom:5px;
+      letter-spacing:.03em;
+    }
+    .shop-panel .shop-card button {
+      margin-top: 4px;
+      width: 97%;
+    }
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .feature-wrapper, .shop-panel { max-width: 98vw; }
+    }
+    @media (max-width: 900px) {
+      .about-panel { max-width:98vw;padding:1.1rem 5vw; }
+      .feature-wrapper { min-width:unset; padding: 1rem 2vw;}
+      #games-list { gap:13px; min-width:90vw;}
+      .shop-panel { max-width: 99vw; padding: 1.2rem 3vw;}
+    }
+    @media (max-width: 680px) {
+      .about-panel{flex-direction:column;padding: 0.8rem 1vw;}
+      #main-title { font-size: 1.15rem; }
+      #main-subtitle, .about-panel #about-me-desc {font-size: 0.97rem;}
+      #featured-games-title { font-size: 1.08rem; }
+      #games-list>div[data-admin-game]{min-width: 90vw; max-width:97vw;}
+      .feature-wrapper {padding: .41rem .5rem 1.3rem .5rem;}
+      .shop-panel {padding: .9rem 1vw;}
+      .shop-panel .shop-card { width: 85vw; max-width: 98vw; min-width: 110px; }
+    }
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      height: 7px;
+      background: #111;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg,#232323 65%, #111 100%);
+      border-radius: 8px;
+    }
+    #games-list::-webkit-scrollbar { opacity: 0; height:0;}
+    #games-list:hover::-webkit-scrollbar { opacity:1; height:7px;}
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="side-title">Menu</div>
+    <nav>
+      <a class="active" href="#home">Home</a>
+      <a href="#featured">Featured Games</a>
+      <a href="#shop-section">Shop</a>
+      <a href="#about">About</a>
+      <a href="#poppy">Poppy PlayTime</a>
+      <a href="#tutorials">Tutorials</a>
+    </nav>
+  </div>
+  <div class="main-content">
+    <h1 id="main-title">🎮 Argo's Game World 🎮</h1>
+    <p id="main-subtitle">Welcome to my official game website!</p>
+
+    <!-- Admin Panel Button -->
+    <button id="adminPanelLauncher" title="Admin panel">Admin</button>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal">
+      <div id="adminLoginBox">
+        <h3 style="margin-top:0; color:#fff;">Admin Login</h3>
+        <input type="password" id="adminPassword" placeholder="Enter password" autocomplete="off">
+        <button onclick="adminLogin()">Login</button>
+        <div id="adminLoginMessage" style="margin-top:7px; color:#fff;"></div>
+        <button class="admin-close-btn" onclick="closeAdminLoginModal()" style="">X </button>
+      </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminPanelModal">
+      <div id="adminPanelBox">
+        <button class="admin-close-btn" onclick="closeAdminPanel()" title="Close">×</button>
+        <h3 style="color:#fff; margin-top:0;">Admin Panel</h3>
+
+        <p class="admin-section-title">Main Title</p>
+        <div class="admin-field-edit-row">
+          <input id="adminEditTitle" type="text" />
+          <button class="admin-edit-btn" onclick="saveEditField('main-title', 'adminEditTitle')">Save</button>
+        </div>
+
+        <p class="admin-section-title">Subtitle</p>
+        <div class="admin-field-edit-row">
+          <input id="adminEditSubtitle" type="text" />
+          <button class="admin-edit-btn" onclick="saveEditField('main-subtitle', 'adminEditSubtitle')">Save</button>
+        </div>
+
+        <hr class="admin-panel-divider">
+
+        <p class="admin-section-title">About Me Text</p>
+        <div class="admin-field-edit-row">
+          <textarea id="adminEditAbout"></textarea>
+          <button class="admin-edit-btn" onclick="saveEditField('about-me-desc', 'adminEditAbout', true)">Save</button>
+        </div>
+
+        <p class="admin-section-title">Profile Picture URL</p>
+        <div class="admin-field-edit-row">
+          <input id="adminEditProfilePic" type="text" />
+          <button class="admin-edit-btn" onclick="saveEditProfilePic()">Save</button>
+        </div>
+
+        <hr class="admin-panel-divider">
+
+        <p class="admin-section-title">Featured Games Titles/Descriptions/Links/Images</p>
+        <div id="admin-games-controls"></div>
+
+        <hr class="admin-panel-divider">
+        <p class="admin-section-title">Rivals (Video Showcase)</p>
+        <div class="admin-field-edit-row">
+          <label>Title: </label>
+          <input id="adminEditRivalsTitle" type="text" style="width:130px;">
+          <button class="admin-edit-btn" onclick="saveEditField('rivals-title', 'adminEditRivalsTitle')">Save</button>
+        </div>
+        <div class="admin-field-edit-row">
+          <label>Video src: </label>
+          <input id="adminEditRivalsVideo" type="text" style="width:130px;">
+          <button class="admin-edit-btn" onclick="saveEditRivalsVideo()">Save</button>
+        </div>
+
+        <div class="admin-panel-actions">
+          <button onclick="closeAdminPanel()" style="margin-right:8px;">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT PANEL -->
+    <div class="about-panel glass-panel" id="about">
+      <img id="about-profile-pic" src="profilepic.jpg" alt="My Profile" width="160">
+      <div style="max-width:420px;">
+        <h2>About Me</h2>
+        <p id="about-me-desc">
+           Hi! I'm Areg, a passionate game creator. Explore my Scratch, Roblox and other awesome game projects! Check out the games below and have fun!
+        </p>
+      </div>
+    </div>
+
+    <!-- SIDESCROLLABLE SCRATCH & ROBLOX GAMES -->
+    <h2 id="featured-games-title" id="featured">🌟 Featured Games 🌟</h2> 
+
+    <!-- Featured Games Wrapper -->
+    <div class="feature-wrapper glass-panel" id="featured">
+      <div id="games-list">
+        <!-- SCRATCH GAME -->
+        <div data-admin-game="0">
+          <a id="game0-link" href="https://scratch.mit.edu/projects/861613912/fullscreen/" target="_blank" style="text-decoration:none;">
+            <img id="game0-img" src="game1.jpg" width="280">
+            <div id="game0-title">Car Parking</div>
+            <div id="game0-desc">Park the car like a pro without toching anything!</div>
+            <button class="game-btn">
+              Play Now
+            </button>
+          </a>
+          <div class="comment-section-outer">
+            <div class="comment-section-inner">
+              <form onsubmit="addComment(event, this)">
+                <input type="text" placeholder="Write a comment...">
+                <button type="submit">Post</button>
+              </form>
+              <div class="comments-list"></div>
+            </div>
+          </div>
+          <!-- Game Forum Section -->
+          <div class="game-forum-section" data-game-forum="0">
+            <div class="forum-topics-title">Forum Topics</div>
+            <ul class="forum-topic-list" id="forum-topic-list-0"></ul>
+            <form class="forum-add-topic-form" onsubmit="addForumTopic(event, 0)">
+              <input type="text" placeholder="Topic title" required style="flex:2;">
+              <textarea placeholder="Topic content" required rows="1" style="flex:3;"></textarea>
+              <button type="submit">Add Topic</button>
+            </form>
+          </div>
+        </div>
+        <!-- ROBLOX GAME -->
+        <div data-admin-game="1">
+          <a id="game1-link" href="https://www.roblox.com/games/1234567890/My-Roblox-Game" target="_blank" style="text-decoration:none;">
+            <img id="game1-img" src="game4.jpg" width="280">
+            <div id="game1-title">Nyan Tower</div>
+            <div id="game1-desc">A Game based with a legendary meme inspired by "Nyan Cat"</div>
+            <button class="game-btn">Play on Roblox</button>
+          </a>
+          <div class="comment-section-outer">
+            <div class="comment-section-inner">
+              <form onsubmit="addComment(event, this)">
+                <input type="text" placeholder="Write a comment...">
+                <button type="submit">Post</button>
+              </form>
+              <div class="comments-list"></div>
+            </div>
+          </div>
+          <!-- Game Forum Section -->
+          <div class="game-forum-section" data-game-forum="1">
+            <div class="forum-topics-title">Forum Topics</div>
+            <ul class="forum-topic-list" id="forum-topic-list-1"></ul>
+            <form class="forum-add-topic-form" onsubmit="addForumTopic(event, 1)">
+              <input type="text" placeholder="Topic title" required style="flex:2;">
+              <textarea placeholder="Topic content" required rows="1" style="flex:3;"></textarea>
+              <button type="submit">Add Topic</button>
+            </form>
+          </div>
+        </div>
+        <!-- SCRATCH GAME 2 -->
+        <div data-admin-game="2">
+          <a id="game2-link" href="https://scratch.mit.edu/projects/841282043/fullscreen/" target="_blank" style="text-decoration:none;">
+            <img id="game2-img" src="game2.jpg" width="280">
+            <div id="game2-title">Minecraft 2D</div>
+            <div id="game2-desc">Same block adventure but in your browser!</div>
+            <button class="game-btn">Play Now</button>
+          </a>
+          <div class="comment-section-outer">
+            <div class="comment-section-inner">
+              <form onsubmit="addComment(event, this)">
+                <input type="text" placeholder="Write a comment...">
+                <button type="submit">Post</button>
+              </form>
+              <div class="comments-list"></div>
+            </div>
+          </div>
+          <!-- Game Forum Section -->
+          <div class="game-forum-section" data-game-forum="2">
+            <div class="forum-topics-title">Forum Topics</div>
+            <ul class="forum-topic-list" id="forum-topic-list-2"></ul>
+            <form class="forum-add-topic-form" onsubmit="addForumTopic(event, 2)">
+              <input type="text" placeholder="Topic title" required style="flex:2;">
+              <textarea placeholder="Topic content" required rows="1" style="flex:3;"></textarea>
+              <button type="submit">Add Topic</button>
+            </form>
+          </div>
+        </div>
+        <!-- ROBLOX GAME 2 -->
+        <div data-admin-game="3">
+          <a id="game3-link" href="https://www.roblox.com/games/16752287604/Capture-the-flag" target="_blank" style="text-decoration:none;">
+            <img id="game3-img" src="game5.jpg" width="280">
+            <div id="game3-title">Capture the flag</div>
+            <div id="game3-desc">Steal the flag and shoot your opponents to make it easy!</div>
+            <button class="game-btn">Play on Roblox</button>
+          </a>
+          <div class="comment-section-outer">
+            <div class="comment-section-inner">
+              <form onsubmit="addComment(event, this)">
+                <input type="text" placeholder="Write a comment...">
+                <button type="submit">Post</button>
+              </form>
+              <div class="comments-list"></div>
+            </div>
+          </div>
+          <!-- Game Forum Section -->
+          <div class="game-forum-section" data-game-forum="3">
+            <div class="forum-topics-title">Forum Topics</div>
+            <ul class="forum-topic-list" id="forum-topic-list-3"></ul>
+            <form class="forum-add-topic-form" onsubmit="addForumTopic(event, 3)">
+              <input type="text" placeholder="Topic title" required style="flex:2;">
+              <textarea placeholder="Topic content" required rows="1" style="flex:3;"></textarea>
+              <button type="submit">Add Topic</button>
+            </form>
+          </div>
+        </div>
+        <!-- SCRATCH GAME 2 (Extra) -->
+        <div data-admin-game="2">
+          <a id="game2-link" href="https://scratch.mit.edu/projects/911970216/fullscreen/" target="_blank" style="text-decoration:none;">
+            <img id="game6-img" src="game6.jpg" width="280">
+            <div id="game2-title">Appel</div>
+            <div id="game2-desc">Platformer, fun smooth lot of levels!</div>
+            <button class="game-btn">Play Now</button>
+          </a>
+          <div class="comment-section-outer">
+            <div class="comment-section-inner">
+              <form onsubmit="addComment(event, this)">
+                <input type="text" placeholder="Write a comment...">
+                <button type="submit">Post</button>
+              </form>
+              <div class="comments-list"></div>
+            </div>
+          </div>
+          <!-- Game Forum Section -->
+          <div class="game-forum-section" data-game-forum="4">
+            <div class="forum-topics-title">Forum Topics</div>
+            <ul class="forum-topic-list" id="forum-topic-list-4"></ul>
+            <form class="forum-add-topic-form" onsubmit="addForumTopic(event, 4)">
+              <input type="text" placeholder="Topic title" required style="flex:2;">
+              <textarea placeholder="Topic content" required rows="1" style="flex:3;"></textarea>
+              <button type="submit">Add Topic</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIDEO GAME SHOWCASE -->
+    <div id="tutorials" style="flex:1 1 100%; display:flex; flex-direction:column; align-items:center; margin-top:40px;">
+      <div id="rivals-title">Rivals (Recomended)</div>
+      <video id="rivalsVideo" controls>
+        <source id="rivalsVideoSource" src="strongrecom.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <a href="https://www.roblox.com/games/17625359962/RIVALS" style="text-decoration:none;">
+        <button class="game-btn">Play on Roblox</button>
+      </a>
+      <div style="color: #bbb; margin-top: 15px; font-size: 1.03rem;">
+        <p><a href="https://www.roblox.com/users/20349956/profile" style="color: var(--accent);text-decoration:underline;">Made by Nosniy</a></p>
+      </div>
+    </div>
+
+    <!-- Tutorial Button and Modal -->
+    <div style="text-align:center; margin-top:40px;">
+      <button id="tutorialBtn" class="game-btn" style="margin-top:20px;">Tutorial: How to Install Roblox</button>
+    </div>
+    <div id="tutorialModal">
+      <div>
+        <button onclick="closeModal()" class="admin-close-btn" style="position:absolute; top:14px; right:14px;">&times;</button>
+        <video controls style="max-width:80vw; max-height:70vh; border-radius:12px;">
+          <source src="tutroblox.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+
+      <!-- Tutorial Modal 2 (Steam install) -->
+  <div style="text-align:center; margin-top:40px;">
+    <button id="tutorialBtn" class="game-btn" style="margin-top:20px;">Tutorial: How to Install Steam</button>
+  </div>
+  <div id="tutorialModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.93); z-index:3000; align-items:center; justify-content:center;">
+    <div style="position:relative; background:#181818; padding:24px 20px 20px 20px; border-radius:16px; box-shadow:0 4px 30px #000, 0 2px 6px #111; max-width:95vw; max-height:90vh; display:flex; flex-direction:column; align-items:center;">
+      <button onclick="closeModal()" style="position:absolute; top:14px; right:14px; background:#fff; color:#181b24; border:none; font-size:1.22rem; font-weight:900; border-radius:50%; width:29px; height:29px; cursor:pointer; z-index:11; box-shadow:0 2px 8px #0004;">&times;</button>
+      <video controls style="max-width:78vw; max-height:70vh; border-radius:12px;">
+        <source src="tutroblox.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
+    <!-- POPPY PLAYTIME - Extra Feature Section -->
+    <div class="feature-wrapper glass-panel" id="poppy" style="margin:60px auto 0 auto;">
+      <h2 style="color:#fff; text-align:center; margin-bottom:18px;font-family:'Montserrat', 'Segoe UI', Arial, sans-serif;">Poppy PlayTime</h2>
+      <div style="display: flex; gap:32px; min-width:900px; overflow-x: auto; overflow-y: visible; white-space: nowrap; padding-bottom:8px;">
+        <div style="background:#191919; border-radius:13px; box-shadow:0 4px 12px #111, 0 2px 6px #222; min-width:250px; max-width:330px; padding:23px 13px; margin-bottom:10px; text-align:center; flex:0 0 290px; display:inline-flex; flex-direction:column; align-items:center;">
+          <a href="https://store.steampowered.com/app/1721470/Poppy_Playtime/" target="_blank" style="text-decoration:none;">
+            <img src="" alt="" width="200" style="border-radius:10px; box-shadow:0 4px 15px 0 #111,0 1.5px 5px #111;">
+            <div style="font-weight:bold; font-size:1.21rem; color:#fff; text-shadow:1px 2px 8px #191919, 0 0 8px #333; margin:13px 0 6px 0; font-family:'Montserrat', 'Segoe UI', Arial, sans-serif;"></div>
+            <div style="font-size:.97rem; color:#bbb; margin-bottom:8px;"></div>
+          <img src="pp1.jpg" alt="Space Darts" width="200" style="border-radius:10px; box-shadow:0 4px 15px 0 #111,0 1.5px 5px #000;">
+          <div style="font-weight:bold; font-size:1.21rem; color:#fff; text-shadow:1px 2px 7px #111, 0 0 8px #191919; margin:13px 0 6px 0; font-family:'Montserrat', 'Segoe UI', Arial, sans-serif;">Chapter 1</div>
+          <div style="font-size:.97rem; color:#bbb; margin-bottom:8px;"></div>
+          <button class="game-btn">Buy Now</button>
+        </a>
+        <div class="comment-section-outer">
+          <div class="comment-section-inner">
+            <form onsubmit="addComment(event, this)">
+              <input type="text" placeholder="Write a comment...">
+              <button type="submit">Post</button>
+            </form>
+            <div class="comments-list"></div>
+          </div>
+        </div>
+        </div>
+      <div style="background:#111; border-radius:13px; box-shadow:0 4px 12px #222, 0 2px 6px #000; min-width:250px; max-width:330px; padding:23px 13px; margin-bottom:10px; text-align:center; flex:0 0 290px; display:inline-flex; flex-direction:column; align-items:center;">
+        <a href="https://store.steampowered.com/app/1817490/Poppy_Playtime__Chapter_2/" target="_blank" style="text-decoration:none;">
+          <img src="pp2.jpg" alt="Mini Platformer" width="200" style="border-radius:10px; box-shadow:0 4px 15px 0 #000,0 1.5px 5px #000;">
+          <div style="font-weight:bold; font-size:1.21rem; color:#fff; text-shadow:1px 2px 7px #222, 0 0 8px #111; margin:13px 0 6px 0; font-family:'Montserrat', 'Segoe UI', Arial, sans-serif;">Chapter 2</div>
+          <div style="font-size:.97rem; color:#bbb; margin-bottom:8px;"></div>
+          <button class="game-btn">Buy Now</button>
+        </a>
+        <div class="comment-section-outer">
+          <div class="comment-section-inner">
+            <form onsubmit="addComment(event, this)">
+              <input type="text" placeholder="Write a comment...">
+              <button type="submit">Post</button>
+            </form>
+            <div class="comments-list"></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#111; border-radius:13px; box-shadow:0 4px 12px #222, 0 2px 6px #000; min-width:250px; max-width:330px; padding:23px 13px; margin-bottom:10px; text-align:center; flex:0 0 290px; display:inline-flex; flex-direction:column; align-items:center;">
+        <a href="https://store.steampowered.com/app/2555190/Poppy_Playtime__Chapter_3/" target="_blank" style="text-decoration:none;">
+          <img src="pp3.jpg" alt="Space Darts" width="200" style="border-radius:10px; box-shadow:0 4px 15px 0 #000,0 1.5px 5px #000;">
+          <div style="font-weight:bold; font-size:1.21rem; color:#fff; text-shadow:1px 2px 7px #222, 0 0 8px #111; margin:13px 0 6px 0; font-family:'Montserrat', 'Segoe UI', Arial, sans-serif;">Chapter 3</div>
+          <div style="font-size:.97rem; color:#bbb; margin-bottom:8px;"></div>
+          <button class="game-btn">Buy Now</button>
+        </a>
+        <div class="comment-section-outer">
+          <div class="comment-section-inner">
+            <form onsubmit="addComment(event, this)">
+              <input type="text" placeholder="Write a comment...">
+              <button type="submit">Post</button>
+            </form>
+            <div class="comments-list"></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#111; border-radius:13px; box-shadow:0 4px 12px #222, 0 2px 6px #000; min-width:250px; max-width:330px; padding:23px 13px; margin-bottom:10px; text-align:center; flex:0 0 290px; display:inline-flex; flex-direction:column; align-items:center;">
+        <a href="https://store.steampowered.com/app/3008670/Poppy_Playtime__Chapter_4/" target="_blank" style="text-decoration:none;">
+          <img src="pp4.jpg" alt="Space Darts" width="200" style="border-radius:10px; box-shadow:0 4px 15px 0 #000,0 1.5px 5px #000;">
+          <div style="font-weight:bold; font-size:1.21rem; color:#fff; text-shadow:1px 2px 7px #222, 0 0 8px #111; margin:13px 0 6px 0; font-family:'Montserrat', 'Segoe UI', Arial, sans-serif;">Chapter 4</div>
+          <div style="font-size:.97rem; color:#bbb; margin-bottom:8px;"></div>
+          <button class="game-btn">Buy Now</button>
+        </a>
+        <div class="comment-section-outer">
+          <div class="comment-section-inner">
+            <form onsubmit="addComment(event, this)">
+              <input type="text" placeholder="Write a comment...">
+              <button type="submit">Post</button>
+            </form>
+            <div class="comments-list"></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#111; border-radius:13px; box-shadow:0 4px 12px #222, 0 2px 6px #000; min-width:250px; max-width:330px; padding:23px 13px; margin-bottom:10px; text-align:center; flex:0 0 290px; display:inline-flex; flex-direction:column; align-items:center;">
+        <a href="https://store.steampowered.com/app/4100940/Poppy_Playtime__Chapter_5/" target="_blank" style="text-decoration:none;">
+          <img src="pp5.jpg" alt="Wall Jumper" width="200" style="border-radius:10px; box-shadow:0 4px 15px 0 #000,0 1.5px 5px #000;">
+          <div style="font-weight:bold; font-size:1.21rem; color:#fff; text-shadow:1px 2px 7px #222, 0 0 8px #111; margin:13px 0 6px 0; font-family:'Montserrat', 'Segoe UI', Arial, sans-serif;">Chapter 5</div>
+          <div style="font-size:.97rem; color:#bbb; margin-bottom:8px;"></div>
+          <button class="game-btn">Buy Now</button>
+        </a>
+        <div class="comment-section-outer">
+          <div class="comment-section-inner">
+            <form onsubmit="addComment(event, this)">
+              <input type="text" placeholder="Write a comment...">
+              <button type="submit">Post</button>
+            </form>
+            <div class="comments-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOP SECTION (Professional Card Grid) -->
+  <div class="shop-panel glass-panel" id="shop-section">
+    <h2>🛒 Gaming Shop 🎮</h2>
+    <div style="display: flex; gap:32px; flex-wrap: wrap; justify-content: center;">
+      <!-- Example shop item 1 -->
+      <div class="shop-card">
+        <img src="ps5contr.jpg" alt="Plush Toy">
+        <div>PlayStation DualSense Wireless Controller</div>
+        <div>Adaptive triggers, immersive vibration, and wireless freedom — this controller makes every game hit different.</div>
+        <div>$77.01</div>
+        <button class="game-btn" onclick="window.open('https://www.amazon.com/PlayStation-DualSense-Wireless-Controller-Gaming-Console/dp/B0CJTCQRNL/ref=sr_1_3?crid=26JSEG2S7M8KZ&dib=eyJ2IjoiMSJ9.f5YL9gV7WutVy6UDaQGApyhhftnfex9H4BR3m_EfuCQlw-P7IqB8OGMJFuBsAa_cOesB7plhyWRiLKFcnlAc9ylvZz_T8LXWB-vLbHDsl8QHomKmbZ_xriOxy-AiUI0Ati8shYwCjopHaFK3jspeO_QjFbimmXQu7KyBB2B5J6mHu_sIxGPx4l7Xd-9ytDHcqnC3FtLABjzXTrgF3wakF7rRn84McAynQelE5cldtzA.DBKAAW8I6oOl0LL9fyQEzfBpFe068_BtqfxoSIV5DMI&dib_tag=se&keywords=joystick%2Bps5&qid=1771693390&sprefix=joystick%2B%2Caps%2C262&sr=8-3&th=1', '_blank')">Buy Now</button>
+      </div>
+      <!-- Example shop item 2 -->
+      <div class="shop-card">
+        <img src="gamingchair.jpg" alt="Sticker Pack">
+        <div>BestOffice High-Back Gaming Chair</div>
+        <div>High-back comfort, smooth recline, and support that survives your longest grind sessions.</div>
+        <div>$80</div>
+        <button class="game-btn" onclick="window.open('https://www.amazon.com/BestOffice-Computer-Ergonomic-Executive-Rolling/dp/B07KVRRFKF/ref=sr_1_8?crid=30N9XFPOQ1YAF&dib=eyJ2IjoiMSJ9.oxe7J3oBE2dGGHBuPtfoJSkVKLjQvjfN7VnEIWF2ewRKYGxJiyQiLArD7yMQNuDfu-vSH6Y6ApB4P-qocFq8RbHtKr5TXIZo6m8BtHnsAXsppqXVfNIuDuASyx_FlOLw9i0NlfByf3morg4kEblsizmRWDNjRVFdMdJQPdKrniTZQI-N2LXFdBlqWUnkXrbAbvXMLqGTOO7CWcho3uwdPSu-unKEPHQ1W4-4jZvSVVAAfBekNDZFOpNo3h16kS5kWClkDCXu9MREDAIqfNQWBNy4vffStSdMirOOw9gJrz0.nC3iAQilVDprtTL49hqTxEol_Z4gDGHdrE9K3VDY-2k&dib_tag=se&keywords=gaming%2Bchair&qid=1771694061&sprefix=gaming%2Bchai%2Caps%2C280&sr=8-8&th=1')">Buy Now</button>
+      </div>
+      <!-- Example shop item 3 -->
+      <div class="shop-card">
+        <img src="keyboard.jpg" alt="Keychain" style="width:80px;">
+        <div>Wireless Gaming Keyboard with Smart Display & Knob Control</div>
+        <div>Smart display for live stats, control knob for easy adjustments, and RGB to flex your setup.</div>
+        <div>$35,99</div>
+        <button class="game-btn" onclick="window.open('https://www.amazon.com/Wireless-Keyboard-Tri-Mode-Keyboards-Compatible/dp/B0FP2HW9T2/ref=sr_1_3?crid=3CBKICEA6OZ2D&dib=eyJ2IjoiMSJ9.J_gGCIlEWsB6XrHMTTbTu5rpEkMsZiI6om29uSDoiZk_LlNGheuYjagiGoHNHQQlFNvlBJMiBqNFDNSVGy41pw9ZyP2o8pDMkriimZjdEhCbpY6n-fn9-JiSVJ-rRm7jkmSPPmVKca8h2gbdbMgLIQb5LGHr3dkxREOzuunL795Opt-C-RnOKbVyx80QXuvdQfGmi9a3t9awiOx1wNexR3SgNfIXVnf5-zSS_susuvU.LZyNce_AKj_TQecI1WyJpjIv-5MK-KmZwCt6q1e5rkA&dib_tag=se&keywords=Wireless+Gaming+Keyboard+with+Smart+Display+%26+Knob+Control&nsdOptOutParam=true&qid=1771694103&sprefix=wireless+gaming+keyboard+with+smart+display+%26+knob+control%2Caps%2C318&sr=8-3')">Buy Now</button>
+      </div>
+    </div>
+    <h2>Setup Accsesories</h2>
+    <div style="display: flex; gap:32px; flex-wrap: wrap; justify-content: center;">
+      <div class="shop-card">
+        <img src="mouse.jpg" alt="" style="width:86px;">
+        <div>Razer Basilisk V3 Customizable Ergonomic Gaming Mouse</div>
+        <div>Customizable buttons, ergonomic design, and insane precision — this mouse turns every move into a power play.</div>
+        <div>$37,99</div>
+        <button class="game-btn" onclick="window.open('https://www.amazon.com/Razer-Basilisk-Customizable-Ergonomic-Gaming/dp/B09C13PZX7/ref=sr_1_2?crid=GBPZGLOE02KU&dib=eyJ2IjoiMSJ9.lmhGgEdAHWvTfUM0QvVPTYTeuR9HT6FwYpPTqQw7UaaBhbXNnRy8MisWIpNF6AWiPsHPKSq5cCQMQ2HPlXXYwzanlYIpVw_0t37l15ap08NVC0WWI4Okl7bMBMBL_LMQp5GYybfczrefnyevyhO45YPFohaUpZzoPdiFembwpW6Aff2uqjgKl_Afy7ZricGqKGDxkua9M7HPDCuQYYY6Xi9QfPJf783HgnnPkLW_NZQ.bhbOh-YmlwRsbQObkwxf6koPzJVLUKwiFOx0rGFFAxg&dib_tag=se&keywords=Razer%2BBasilisk%2BV3%2BCustomizable%2BErgonomic%2BGaming%2BMouse&qid=1771694147&sprefix=razer%2Bbasilisk%2Bv3%2Bcustomizable%2Bergonomic%2Bgaming%2Bmouse%2Caps%2C257&sr=8-2&th=1')">Buy Now</button>
+      </div>
+      <div class="shop-card">
+        <img src="pad.jpg" alt="Keychain" style="width:80px;">
+        <div>SteelSeries QcK Gaming Mouse Pad</div>
+        <div>Ultra-slick surface, perfect size, zero distractions — your mouse deserves this.</div>
+        <div>$35,99</div>
+        <button class="game-btn" onclick="window.open('https://www.amazon.com/SteelSeries-Heavy-Cloth-Gaming-Mouse/dp/B00WAA2704/ref=sr_1_1?crid=3CAWPM7HETVWD&dib=eyJ2IjoiMSJ9.Il_5b0lb20AR_wmyWE4OP6i4DrWE7vzzbOZK9Jrq3FOjX9pZYlM-qI3FpmXRCDVSk6o_Rk5cxia0vJAUBcGlo_WXvQ30VeROI66l3sNiNvuHgcd1C0K0z_gwEd9cHESmc-F_PtnH0vKOsAEk4LlgwNEJNtbos47kEId_9u26VvK4gmz8CX1XdhUslPgRCKwECZcK10AzYrfZl1QHdXnkQwlccIpo_J7idvZEsFZz7hQ.-SIt36QNkNXVgj3BUWX28AzLRb8Hg92QMHNEpTFs-8Q&dib_tag=se&keywords=SteelSeries%2BQcK%2BGaming%2BMouse%2BPad&qid=1771694211&sprefix=steelseries%2Bqck%2Bgaming%2Bmouse%2Bpad%2Caps%2C237&sr=8-1&th=1')">Buy Now</button>
+      </div>
+    </div>
+    <h2>Main Setup</h2>
+    <div style="display: flex; gap:32px; flex-wrap: wrap; justify-content: center;">
+    <div style="display: flex; gap:38px; flex-wrap: wrap; justify-content: center;">
+      <div class="shop-card">
+        <img src="pc.jpg" alt="T-shirt" style="width:110px;">
+        <div>ASUS ROG G700 Prebuilt Gaming Desktop PC</div>
+        <div>Next-gen power, insane graphics, and zero lag — this rig turns every game into a highlight.</div>
+        <div>$1 894,94</div>
+        <button class="game-btn" onclick="window.open('https://www.amazon.com/ASUS-Desktop-Processor-NVIDIA%C2%AE-G700TF-MS776/dp/B0FVQYBVGP/ref=sr_1_1?crid=2ZGRYXM36KU6&dib=eyJ2IjoiMSJ9.5Qz5vEiCBqgc3hvLsme84piY4aHi4__ykDNwBQt9eajToYJUHzAvz0SQyavqwNs1uMmnshsTHndrkjPP0hLhPqYugJBPFfqFAeiTEVSB2QcJiLzmhU2oL3VfMo8RKr1RR_10U17q-73I4hJ8ItE12lkrlWS34FRrGQFueXlCaDRbldej0_4iVG796milcKsYNbf3zsTmr9I7c4nwUK5oemLZsHuVZVlhR89Juj_fziM.xwHHMAEyiRbMbIxsRrFZ6ivfMiyc4aqD5ME8fwN0724&dib_tag=se&keywords=ASUS%2BROG%2BG700%2BPrebuilt%2BGaming%2BDesktop%2BPC&qid=1771694320&sprefix=asus%2Brog%2Bg700%2Bprebuilt%2Bgaming%2Bdesktop%2Bpc%2Caps%2C242&sr=8-1&th=1')">Buy Now</button>
+      </div>
+      <!-- ... etc for monitor, PS5 -->
+      <div class="shop-card">
+        <img src="monitor.jpg" alt="T-shirt" style="width:110px;">
+        <div>Samsung Odyssey OLED QD-OLED Gaming Monitor</div>
+        <div>QD-OLED colors, QHD clarity, ultra-smooth refresh — every frame hits harder and every game pops.</div>
+        <div>$350,02</div>
+        <button class="game-btn" onclick="window.open('https://www.amazon.com/Samsung-Response-Compatible-FreeSyncTM-LS27FG500SNXZA/dp/B0FNQDNGXY/ref=sr_1_1?crid=21FPAZ3BDCCH2&dib=eyJ2IjoiMSJ9.Tqxo3DFV_bCFXDUSVbqb2lLE8Y6ZrnKOQW7DrgfeVEm4fystakk9wMf7er0Z2oHDSVPUnroEGi6Bbkk6U2bQvtCkDn3EDdzZgg6fM__9GqpC6dcpXs-fFSZMRrBuzlGaew0OQ0W3s9Rp51N0nFanwgwFTU3nYzXUTRU88H6SgXmTnpoh5C0OfQ_s0dPBjuXnpX69iJcwGL5ZL0pBwSULnuMe4tomGhFmJe3BgiR23w0.gVPdlYMq4ANv-vno367M9Hs10jUGt0ECDSS_ajJ6h6s&dib_tag=se&keywords=Samsung+Odyssey+OLED+QD-OLED+Gaming+Monitor&qid=1771694359&sprefix=samsung+odyssey+oled+qd-oled+gaming+monitor%2Caps%2C244&sr=8-1')">Buy Now</button>
+      </div>
+      <div class="shop-card">
+        <img src="ps5.jpg" alt="T-shirt" style="width:110px;">
+        <div>PlayStation 5 Digital Edition</div>
+        <div>Next-gen gaming, lightning-fast load times, and epic exclusives — your new main squeeze.</div>
+        <div>$468,87</div>
+        <button class="game-btn" onclick="window.open('https:https://www.amazon.com/PlayStation-5-Digital/dp/B0BCNTW8GH/ref=sr_1_3?crid=MO2CCO6AGGK3&dib=eyJ2IjoiMSJ9.DN24o4RYS97v_6zyZZGG7XQHjpCUdj1Fu8KCQgWv3Ddu4C4qhXF_Qfkq0OpR1E_V4V91IIwUGiXj8ij-SxGOr0CVebxrh8L_c-nHeqv3ujz0kXaMovxOtoEnBMKN24rylY0LPTWML6TRhQwEJNSsE2CtP_BOUKQWH9S9qm_si0gfVEzdcUCJfNGYy58umICsr5KA-8QdvdWLJE4KEVvXO38XkKDGMkxdK-5ampEcUzY.IlKlwOnE89STYwOEH4Lwn_N204UB9seu2qT6ThN--10&dib_tag=se&keywords=PlayStation+5&qid=1771694383&sprefix=playstation+%2Caps%2C279&sr=8-3')">Buy Now</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Add comment function for all game comment sections
+    function addComment(event, form) {
+      event.preventDefault();
+      const input = form.querySelector('input');
+      const text = input.value.trim();
+      if (text === "") return;
+      const commentDiv = document.createElement('div');
+      commentDiv.className = 'game-comment';
+      commentDiv.textContent = text;
+      // Comments go in the sibling .comments-list
+      const commentsList = form.parentElement.querySelector('.comments-list');
+      commentsList.appendChild(commentDiv);
+      input.value = '';
+    }
+
+    // Forum per-game logic
+    function addForumTopic(event, gameIndex) {
+      event.preventDefault();
+      const form = event.target;
+      const titleInput = form.querySelector('input[type="text"]');
+      const contentTextarea = form.querySelector('textarea');
+      const title = titleInput.value.trim();
+      const content = contentTextarea.value.trim();
+      if (!title || !content) return;
+      // Create topic
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span class="forum-topic-title">${title}</span>
+        <span class="forum-topic-content">${content}</span>
+      `;
+      document.getElementById(`forum-topic-list-${gameIndex}`).appendChild(li);
+      titleInput.value = '';
+      contentTextarea.value = '';
+    }
+
+    // Modal logic for Roblox tutorial
+    document.getElementById('tutorialBtn').onclick = function() {
+      document.getElementById('tutorialModal').style.display = 'flex';
+    };
+    function closeModal() {
+      document.getElementById('tutorialModal').style.display = 'none';
+    }
+
+    // --- ADMIN PANEL JS (unchanged) ---
+    const adminPanelLauncher = document.getElementById('adminPanelLauncher');
+    const adminLoginModal = document.getElementById('adminLoginModal');
+    const adminPasswordInput = document.getElementById('adminPassword');
+    const adminLoginMessage = document.getElementById('adminLoginMessage');
+    const adminPanelModal = document.getElementById('adminPanelModal');
+    const adminPanelBox = document.getElementById('adminPanelBox');
+    function adminFillGamesControls() {
+      const parent = document.getElementById('admin-games-controls');
+      parent.innerHTML = '';
+      let totalGames = 4;
+      for(let g=0; g<totalGames; ++g) {
+        let row = document.createElement('div');
+        row.className = "admin-field-edit-row";
+        row.style.flexDirection = "column";
+        row.style.alignItems = "flex-start";
+        row.style.marginBottom = "10px";
+        let t = `<div style="color:#fff; font-weight:bold;">Game #${g+1}</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap;">
+          <label>Title: </label>
+          <input id="game${g}-admin-title" type="text" value="">
+          <button class="admin-edit-btn" onclick="saveEditField('game${g}-title', 'game${g}-admin-title')">Save</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap;">
+          <label>Description: </label>
+          <input id="game${g}-admin-desc" type="text" value="" style="width:170px;">
+          <button class="admin-edit-btn" onclick="saveEditField('game${g}-desc', 'game${g}-admin-desc')">Save</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap;">
+          <label>Image URL: </label>
+          <input id="game${g}-admin-img" type="text" value="">
+          <button class="admin-edit-btn" onclick="saveEditField('game${g}-img', 'game${g}-admin-img', false, true)">Save</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:3px;flex-wrap:wrap;">
+          <label>Link URL: </label>
+          <input id="game${g}-admin-link" type="text" value="">
+          <button class="admin-edit-btn" onclick="saveEditField('game${g}-link', 'game${g}-admin-link', false, false, true)">Save</button>
+        </div>`;
+        row.innerHTML = t;
+        parent.appendChild(row);
+      }
+    }
+    function openAdminPanel() {
+      document.getElementById('adminEditTitle').value = document.getElementById('main-title')?.innerHTML;
+      document.getElementById('adminEditSubtitle').value = document.getElementById('main-subtitle')?.innerHTML;
+      document.getElementById('adminEditAbout').value = document.getElementById('about-me-desc')?.innerHTML;
+      document.getElementById('adminEditProfilePic').value = document.getElementById('about-profile-pic')?.src || '';
+      document.getElementById('adminEditRivalsTitle').value = document.getElementById('rivals-title')?.innerHTML || '';
+      document.getElementById('adminEditRivalsVideo').value = document.getElementById('rivalsVideoSource')?.src || '';
+      for(let g=0; g<4; ++g) {
+        document.getElementById(`game${g}-admin-title`).value =
+          document.getElementById(`game${g}-title`)?.innerHTML || '';
+        document.getElementById(`game${g}-admin-desc`).value =
+          document.getElementById(`game${g}-desc`)?.innerHTML || '';
+        document.getElementById(`game${g}-admin-img`).value =
+          document.getElementById(`game${g}-img`)?.src || '';
+        document.getElementById(`game${g}-admin-link`).value =
+          document.getElementById(`game${g}-link`)?.getAttribute('href') || '';
+      }
+      adminPanelModal.style.display = "flex";
+    }
+    adminPanelLauncher.onclick = function() {
+      adminLoginModal.style.display = "flex";
+      adminPasswordInput.value = "";
+      adminLoginMessage.textContent = "";
+      setTimeout(() => adminPasswordInput.focus(), 120);
+    };
+    function closeAdminLoginModal() {
+      adminLoginModal.style.display = "none";
+    }
+    function closeAdminPanel() {
+      adminPanelModal.style.display = "none";
+    }
+    function adminLogin() {
+      if (adminPasswordInput.value === "077362453") {
+        adminLoginModal.style.display = "none";
+        openAdminPanel();
+      } else {
+        adminLoginMessage.textContent = "Incorrect password!";
+      }
+    }
+    function saveEditField(editId, inputId, useHTML, isImage, isLink) {
+      var el = document.getElementById(editId);
+      var val = document.getElementById(inputId).value;
+      if (!el) return;
+      if (isImage) el.src = val;
+      else if (isLink) el.setAttribute('href', val);
+      else if (useHTML) el.innerHTML = val;
+      else el.textContent = val;
+    }
+    function saveEditProfilePic() {
+      var url = document.getElementById('adminEditProfilePic').value;
+      var img = document.getElementById(' -profile-pic');
+      if (img) img.src = url;
+    }
+    function saveEditRivalsVideo() {
+      var url = document.getElementById('adminEditRivalsVideo').value;
+      var videoSrc = document.getElementById('rivalsVideoSource');
+      if (videoSrc) {
+        videoSrc.src = url;
+        document.getElementById('rivalsVideo').load();
+      }
+    }
+    adminPasswordInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') adminLogin();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (adminLoginModal.style.display === 'flex' && e.key === 'Escape') closeAdminLoginModal();
+      if (adminPanelModal.style.display === 'flex' && e.key === 'Escape') closeAdminPanel();
+    });
+    window.addEventListener('DOMContentLoaded', function() {
+      adminFillGamesControls();
+    });
+  </script>
+</body>
+</html>
